@@ -4,6 +4,7 @@ import pickle
 import sys
 import json
 from botocore.exceptions import ClientError
+import os
 
 input_bucket = "cse546-2-input"
 output_bucket = "cse546-2-output"
@@ -46,6 +47,18 @@ def face_recognition_handler(event, context):
 		if e.response['Error']['Code'] == '404':
 			print('The video file does not exist in s3://{}/{}'.format(bucket, key))
 		else: raise e
+	
+	# Extracting frames using ffmpeg
+	os.system("ffmpeg -i " + str(video_file_path) + " -r 1 " + str(path) + "image-%3d.jpeg")
 
-	print("Received event: " + json.dumps(event['Records'][0]['s3']['object']['key']))
+	# Reading first image file and its encoding
+	img = face_recognition.load_image_file(path+'image-001.jpeg')
+	img_enc = face_recognition.face_encodings(img)[0]
+
+	# Read the encoding file
+	encoding_file = '/home/app/encoding'
+	face_encoding = open_encoding(encoding_file)
+	print("encoding: " + face_encoding)
+
+	#print("Received event: " + json.dumps(event['Records'][0]['s3']['object']['key']))
 	return 'Hello from AWS Lambda using Python' + sys.version + '!'

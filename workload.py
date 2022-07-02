@@ -52,8 +52,8 @@ def upload_files(test_case):
 	
 def workload_generator():
 	
-	print("Running Test Case 1")
-	upload_files("test_case_1")
+	print("Running Test Case 0")
+	upload_files("test_case_0")
 
 	#print("Running Test Case 2")
 	#upload_files("test_case_2")
