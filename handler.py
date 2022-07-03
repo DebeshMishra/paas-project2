@@ -2,15 +2,15 @@ from boto3 import client as boto3_client
 import face_recognition
 import pickle
 import sys
-import json
 from botocore.exceptions import ClientError
 import os
 
-input_bucket = "cse546-2-input"
-output_bucket = "cse546-2-output"
+output_bucket = "cse546-project2-paas-output"
 
+access_key = 'AKIAR2FYKC34HDRIALXK'
+secret_key = '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'
 region = 'us-east-1'
-s3 = boto3_client('s3', region_name=region)
+s3 = boto3_client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key, region_name=region)
 
 # Function to read the 'encoding' file
 def open_encoding(filename):
@@ -23,7 +23,7 @@ def face_recognition_handler(event, context):
 	
 	# Getting the Bucket and Key name from S3 client
 	bucket = event['Records'][0]['s3']['bucket']['name']
-	key = json.dumps(event['Records'][0]['s3']['object']['key'])
+	key = event['Records'][0]['s3']['object']['key']
 
 	# Fetching the video file from S3
 	try:
@@ -58,7 +58,12 @@ def face_recognition_handler(event, context):
 	# Read the encoding file
 	encoding_file = '/home/app/encoding'
 	face_encoding = open_encoding(encoding_file)
-	print("encoding: " + face_encoding)
+
+	# Getting the corresponding match from encoding file
+	resultArr = face_recognition.compare_faces(face_encoding['encoding'], img_enc)
+	idx = resultArr.index(True)
+	res = list(face_encoding['name'])[idx]
+	print(res)
 
 	#print("Received event: " + json.dumps(event['Records'][0]['s3']['object']['key']))
 	return 'Hello from AWS Lambda using Python' + sys.version + '!'
