@@ -31,22 +31,32 @@ def face_recognition_handler(event, context):
 	path = '/tmp/'
 	video_file_path = str(path) + key
 
+	frames_path = f'{path}frames/'
+	if not os.path.exists(frames_path):
+		os.mkdir(frames_path)
+
 	print(f"Downloading file {key}")
 	# Downloading the video file from S3 and storing in local
 	try:
 		s3.download_file(bucket, key, video_file_path)
 	except ClientError as e:
 		if e.response['Error']['Code'] == '404':
-			print('The video file does not exist in s3://{}/{}'.format(bucket, key))
+			print(f'The video file does not exist in s3://{bucket}/{key}')
 			return
 		else: raise e
 
 	# Extracting frames using ffmpeg
-	os.system("ffmpeg -i " + str(video_file_path) + " -r 1 " + str(path) + "image-%3d.jpeg")
+	os.system("ffmpeg -i " + str(video_file_path) + " -r 1 " + str(frames_path) + "image-%3d.jpeg")
 
 	# Reading first image file and its encoding
-	img = face_recognition.load_image_file(path+'image-001.jpeg')
-	img_enc = face_recognition.face_encodings(img)[0]
+	frames = sorted(os.listdir(frames_path))
+	print(frames)
+	for frame in frames:
+		img = face_recognition.load_image_file(os.path.join(frames_path, frame))
+		face_encodings = face_recognition.face_encodings(img)
+		if len(face_encodings) > 0:
+			img_enc = face_encodings[0]
+			break
 
 	# Read the encoding file
 	encoding_file = '/home/app/encoding'
