@@ -31,6 +31,7 @@ def face_recognition_handler(event, context):
 	path = '/tmp/'
 	video_file_path = str(path) + key
 
+	print(f"Downloading file {key}")
 	# Downloading the video file from S3 and storing in local
 	try:
 		s3.download_file(bucket, key, video_file_path)
@@ -64,5 +65,5 @@ def face_recognition_handler(event, context):
 	csv = f"{item['name']},{item['major']},{item['year']}"
 	print(csv)
 
-	#print("Received event: " + json.dumps(event['Records'][0]['s3']['object']['key']))
+	s3.put_object(Bucket=output_bucket, Key=name, Body=csv)
 	return csv
