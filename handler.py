@@ -1,8 +1,6 @@
-from boto3 import client as boto3_client
 import boto3
 import face_recognition
 import pickle
-import sys
 from botocore.exceptions import ClientError
 import os
 
@@ -12,7 +10,8 @@ dynamodb_table_name = 'paas-2-student'
 access_key = 'AKIAR2FYKC34HDRIALXK'
 secret_key = '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'
 region = 'us-east-1'
-s3 = boto3_client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key, region_name=region)
+s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_key, region_name=region)
+dynamodb = boto3.resource('dynamodb', aws_access_key_id=access_key, aws_secret_access_key=secret_key, region_name=region)
 
 # Function to read the 'encoding' file
 def open_encoding(filename):
@@ -68,12 +67,11 @@ def face_recognition_handler(event, context):
 	name = list(face_encoding['name'])[idx]
 	print(name)
 
-	dynamodb = boto3.resource('dynamodb', aws_access_key_id=access_key, aws_secret_access_key=secret_key, region_name=region)
 	student_table = dynamodb.Table(dynamodb_table_name)
 	item = student_table.get_item(Key={'name': name})['Item']
 	print(item)
 	csv = f"{item['name']},{item['major']},{item['year']}"
 	print(csv)
 
-	s3.put_object(Bucket=output_bucket, Key=name, Body=csv)
+	s3.put_object(Bucket=output_bucket, Key=key.replace(".mp4", ".csv"), Body=csv)
 	return csv

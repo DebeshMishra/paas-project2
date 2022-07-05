@@ -18,5 +18,5 @@ def get_item():
     print(item)
     print(f"{item['name']},{item['major']},{item['year']}")
 
-# upload_items()
+upload_items()
 get_item()
