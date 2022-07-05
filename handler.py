@@ -48,7 +48,7 @@ def face_recognition_handler(event, context):
 	# Extracting frames using ffmpeg
 	os.system("ffmpeg -i " + str(video_file_path) + " -r 1 " + str(frames_path) + "image-%3d.jpeg")
 
-	# Reading first image file and its encoding
+	# Loop through frames and find first face match
 	frames = sorted(os.listdir(frames_path))
 	print(frames)
 	for frame in frames:
