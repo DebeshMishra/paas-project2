@@ -23,7 +23,7 @@
 <h3 align="center">PaaS Project</h3>
 
   <p align="center">
-    Image Recognition as a service for CSE546 - Cloud Computing
+    Face Recognition as a service for CSE546 - Cloud Computing
     <br />
   </p>
 </div>
